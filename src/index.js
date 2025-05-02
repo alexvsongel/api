@@ -1,14 +1,32 @@
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
+import * as schema from "../db/schema";
 import { cors } from "hono/cors";
+import { Hono } from "hono";
+
+// Importante para que reconozca el archivo .env
+import dotenv from "dotenv";
+dotenv.config();
+
+// Aqui creas el cliente sql de Neon (postgres)
+const sql = neon(process.env.DATABASE_URL);
+// Aqui inicializas drizzle, con el schema de las tablas de ../db/schema.js
+const database = drizzle({ client: sql, schema });
 
 const app = new Hono();
 app.use("*", cors());
 
+app.get("/calendario", async (c) => {
+  const resultado = await database.query.calendar.findMany({});
 
+  if (resultado.length === 0) {
+    return c.json({ error: "NO HAY EVENTOS" });
+  }
 
+  return c.json(resultado);
 
-app.get("/calendario", (c) => {
+  /*
   return c.json([
     {
       title: "Día de cine",
@@ -37,21 +55,37 @@ app.get("/calendario", (c) => {
       descripcion: "",
     },
   ]);
+  */
 });
 
 app.post("/calendario", async (c) => {
   const nuevoEvento = await c.req.json();
-  
-  // Aquí normalmente guardarías en una base de datos
-  console.log("Nuevo evento recibido:", nuevoEvento);
-  
+
+  // aqui valida que los campos del object esten bien
+  // IIMPORTANTE, SI NO VAS A MORIR !!!!
+
+  // Aquí guardas en una base de datos
+  database
+    .insert(schema.calendar)
+    .values(nuevoEvento)
+    .then((data) => console.log(data));
+
   return c.json({
     success: true,
     message: "Evento añadido correctamente",
-    data: nuevoEvento
+    data: nuevoEvento,
   });
 });
 
+app.put("/calendario", async (c) => {
+  return c.json("Aqui podrias usar el put para editar el evento");
+});
+
+app.delete("/calendario", async (c) => {
+  return c.json("Aqui podrias usar el delete para borrar el evento");
+});
+
+// Esto no tocar, se encarga de ejecutar el servidor
 serve(
   {
     fetch: app.fetch,
@@ -59,5 +93,5 @@ serve(
   },
   (info) => {
     console.log(`Server is running on http://localhost:${info.port}`);
-  }
+  },
 );
