@@ -12,4 +12,5 @@ const sql = neon(process.env.DATABASE_URL);
 // Aqui inicializas drizzle, con el schema de las tablas de ../db/schema.js
 const database = drizzle({ client: sql, schema });
 
-export { database };
+export * from "drizzle-orm";
+export { database, schema };
