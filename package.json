@@ -10,9 +10,11 @@
   "dependencies": {
     "@hono/node-server": "^1.14.1",
     "@neondatabase/serverless": "^1.0.0",
+    "better-auth": "1.2.7",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
-    "hono": "^4.7.7"
+    "hono": "^4.7.7",
+    "pg": "8.15.6"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
@@ -25,5 +27,6 @@
   "main": "index.js",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
 }
