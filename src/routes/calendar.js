@@ -1,11 +1,18 @@
 import { Hono } from "hono";
+import { auth } from "../lib/auth";
 
 import { database } from "../lib/database";
 
 const calendar = new Hono();
 
 calendar.get("/", async (c) => {
-  // validamos el token que nos da, asi sabemos, que esta autenticado con nosotros
+  const authorized = await auth.api.getSession({
+    headers: c.req.raw.headers,
+  });
+
+  if (!authorized || !authorized.session || authorized.user) {
+    return c.json({ error: "No estás logeado!!!! &miau)" }, 401);
+  }
 
   const resultado = await database.query.calendar.findMany({});
 
